@@ -1,3 +1,4 @@
+import os
 import codecs
 import configparser
 config = configparser.ConfigParser()
@@ -14,7 +15,12 @@ class MyConfig:
     REDIS_URL: str = None
 
     def __init__(self):
-        config.read_file(codecs.open('config.ini', 'r', 'utf-8-sig'))
+        # 获取当前脚本所在的目录
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        # 构建 config.ini 的完整路径
+        config_path = os.path.join(base_path, '..', 'config.ini')
+
+        config.read_file(codecs.open(config_path, 'r', 'utf-8-sig'))
         self.Real_File = config.get('Credentials', 'Real_File')
         if self.Real_File == "config.ini":
             self.OPENAI_BASE_URL = config.get('Credentials', 'OPENAI_BASE_URL')
