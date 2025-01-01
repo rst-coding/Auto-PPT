@@ -13,6 +13,7 @@ class MyConfig:
     UNSPLASH_API_KEYS: list = None
     REDIS_ENABLE: str = None
     REDIS_URL: str = None
+    AI_INTERFACE: str = None  # 新增配置项
 
     def __init__(self):
         # 获取当前脚本所在的目录
@@ -29,6 +30,7 @@ class MyConfig:
             self.UNSPLASH_ENABLE = config.get('Credentials', 'UNSPLASH_ENABLE')
             self.REDIS_ENABLE = config.get('Credentials', 'REDIS_ENABLE')
             self.REDIS_URL = config.get('Credentials', 'REDIS_URL')
+            self.AI_INTERFACE = config.get('Credentials', 'AI_INTERFACE')  # 读取AI_INTERFACE配置项
         else:
             config.read_file(codecs.open(self.Real_File, 'r', 'utf-8-sig'))
             self.OPENAI_BASE_URL = config.get('Credentials', 'OPENAI_BASE_URL')
@@ -37,6 +39,7 @@ class MyConfig:
             self.UNSPLASH_ENABLE = config.get('Credentials', 'UNSPLASH_ENABLE')
             self.REDIS_ENABLE = config.get('Credentials', 'REDIS_ENABLE')
             self.REDIS_URL = config.get('Credentials', 'REDIS_URL')
+            self.AI_INTERFACE = config.get('Credentials', 'AI_INTERFACE')  # 读取AI_INTERFACE配置项
         print(self.OPENAI_API_KEY)
 
 if __name__ == '__main__':

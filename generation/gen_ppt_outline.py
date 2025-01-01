@@ -3,19 +3,25 @@ import uuid
 from mdtree.tree2ppt import Tree2PPT
 from readconfig.myconfig import MyConfig
 from chain.gpt_memory import GptChain
-
+from chain.chatanywhere_memory import OtherAIChain # 导入新的AI接口类
 
 # 抽象父类
 class Gen:
     config: MyConfig = None
-    GptChain: GptChain = None
+    chain: GptChain or OtherAIChain = None  # 修改变量类型
 
     def __init__(self, session_id):
         self.config = MyConfig()
         print(f"open ai key:{self.config.OPENAI_API_KEY}")
-        self.GptChain = GptChain(openai_api_key=self.config.OPENAI_API_KEY, session_id=session_id,
-                                 redis_url=self.config.REDIS_URL,openai_base_url = self.config.OPENAI_BASE_URL)
+        # self.GptChain = GptChain(openai_api_key=self.config.OPENAI_API_KEY, session_id=session_id,
+        #                          redis_url=self.config.REDIS_URL,openai_base_url = self.config.OPENAI_BASE_URL)
 
+        if self.config.AI_INTERFACE == "chatanywhere":  # 根据配置选择AI接口
+            self.chain = OtherAIChain(api_key=self.config.OPENAI_API_KEY, session_id=session_id,
+                                      api_url=self.config.OPENAI_BASE_URL)
+        else:
+            self.chain = GptChain(openai_api_key=self.config.OPENAI_API_KEY, session_id=session_id,
+                                  redis_url=self.config.REDIS_URL, openai_base_url=self.config.OPENAI_BASE_URL)
 
 # ----------------------------------------------------------------
 # 生成标题
@@ -26,7 +32,7 @@ class GenTitle(Gen):
     def predict_title(self, query):
         text = f"""我希望你帮助我以```{query}```为题生成3个PPT的标题.要求能吸引人的注意.
         """
-        return self.GptChain.predict(text)
+        return self.chain.predict(text)
 
     def predict_title_v2(self, form, role, title1, topic_num=1):
         text = f"""
@@ -34,7 +40,7 @@ class GenTitle(Gen):
                 以下是返回的一些要求：
                 1.【The response should be a list of {topic_num} items separated by \"\n\" (例如: 香蕉\n天气\n说明)】
             """
-        return self.GptChain.predict(text)
+        return self.chain.predict(text)
 
 
 class GenOutline(Gen):
@@ -48,7 +54,7 @@ class GenOutline(Gen):
         3.第一级(#)表示大纲的标题,第二级(##)表示章节的标题,第三级(###)表示章节的重点.
         4.大纲的第一章是```{query}```的简介，最后一章是总结；
         """
-        return self.GptChain.predict(text)
+        return self.chain.predict(text)
 
     def predict_outline_v2(self, title, title_requirement):
         text = f"""我希望你使用markdown的格式根据```{title}```生成一个只有标题的大纲，并且请遵循以下要求:
@@ -58,7 +64,7 @@ class GenOutline(Gen):
             4.对大纲来说，要求```{title_requirement}```
             5.大纲的第一章是```{title}```的简介，最后一章是总结；
         """
-        return self.GptChain.predict(text)
+        return self.chain.predict(text)
 
 
 class GenBody(Gen):
@@ -82,7 +88,7 @@ class GenBody(Gen):
             3.对正文来说，要求{requirement}
             4.你需要把生成的段落放在正确的位置;
             """
-        return self.GptChain.predict(text)
+        return self.chain.predict(text)
 
 
 if __name__ == '__main__':
