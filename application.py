@@ -103,9 +103,9 @@ def gen_ppt():
         if not markdown_data:
             return 'No data provided', 400
         markdown_str = markdown_data.replace('\r', '\n')
-        print(markdown_str)
+        # print(markdown_str)
         ip_address = request.remote_addr
-        app.logger.info(f'ip地址为 {ip_address}\t uuid md转换生成了ppt')
+        app.logger.info(f'ip地址为 {ip_address}\t uuid md转换生成了ppt 内容为 {markdown_str}')
         ppt = Tree2PPT(markdown_str)
         stream = ppt.save_stream()
         response = make_response(stream)
